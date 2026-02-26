@@ -98,4 +98,12 @@ StickerboardSchema.virtual('comments', {
     justOne: false
 });
 
+StickerboardSchema.statics.findByIdOrSlug = function(idOrSlug) {
+  const query = mongoose.Types.ObjectId.isValid(idOrSlug)
+    ? { _id: idOrSlug }
+    : { slug: idOrSlug };
+
+  return this.findOne(query);
+};
+
 module.exports = mongoose.models.Stickerboard || mongoose.model('Stickerboard', StickerboardSchema);

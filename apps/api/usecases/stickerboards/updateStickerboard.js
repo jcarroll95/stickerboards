@@ -20,7 +20,7 @@ const {
 
 /**
  * UpdateStickerboard use case.
- * Express-free. Throws ErrorResponse (your existing error handler understands it).
+ * Express-free. Throws ErrorResponse.
  *
  * @param {{
  *   actor: { id: string, role: string },
@@ -46,7 +46,7 @@ async function updateStickerboardUseCase({ actor, boardId, body }) {
     throw err;
   };
 
-  // Transaction wrapper with replica-set fallback (keeps behavior similar to your original controller)
+  // Transaction wrapper with replica-set fallback
   const runWithOptionalTransaction = async (work) => {
     const session = await mongoose.startSession();
     try {

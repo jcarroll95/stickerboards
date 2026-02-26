@@ -21,7 +21,9 @@ exports.getStickerboards = asyncHandler(async (req, res) => {
  * @access Public
  */
 exports.getStickerboard = asyncHandler(async (req, res, next) => {
-  const stickerboard = await Stickerboard.findById(req.params.id)
+  const idOrSlug = req.params.id;
+
+  const stickerboard = await Stickerboard.findByIdOrSlug(idOrSlug)
     .populate({ path: 'stix', options: { sort: { stickNumber: 1 } } })
     .populate('comments');
 
