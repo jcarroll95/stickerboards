@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const ErrorResponse = require('../../utils/errorResponse');
 const sendEmail = require('../../utils/sendEmail');
 const User = require('../../models/User');
+const { assignStarterPackToUser } = require('../../services/stickerInventory');
 
 const { normalizeEmail, assertValidEmailAndPassword } = require('../../domain/auth/validators');
 
@@ -169,10 +170,18 @@ async function registerVerify({ email, code, nodeEnv }) {
   user.verifyEmailExpire = undefined;
   user.verifyEmailAttempts = 0;
 
-  // Initialize cheersStickers if they don't exist (for existing users during verification)
+ /* Legacy sticker seeding
+ // Initialize cheersStickers if they don't exist (for existing users during verification)
   if (!user.cheersStickers || user.cheersStickers.length === 0) {
     user.cheersStickers = [0, 1, 2, 3, 4];
   }
+*/
+  try {
+    await assignStarterPackToUser(user.id);
+  } catch (err) {
+    console.error('Failed to award starter pack:', err);
+  }
+
 
   await user.save();
 
