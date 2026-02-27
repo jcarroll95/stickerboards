@@ -244,7 +244,7 @@ async function refreshTokens({ refreshToken }) {
   if (!user) throw new ErrorResponse('User no longer exists', 404);
 
   // 3. Generate a new pair of tokens
-  const tokens = user.getTokens();
+  const tokens = user.getSignedJwtToken();
 
   // 4. (Optional but recommended) "Rotate" the refresh token
   // Delete the old one and save the new one in Redis

@@ -13,6 +13,7 @@ const {
   registerResend,
   updateDetails,
   updatePassword,
+  refreshTokens,
   renderResetPasswordForm
 } = require('../usecases/auth/authUsecases');
 
@@ -306,6 +307,6 @@ exports.refresh = asyncHandler(async (req, res, next) => {
   // Call use-case to swap refresh token for new tokens
   const { tokens, user } = await refreshTokens({ refreshToken });
 
-  // Use your helper to send the new tokens back
+  // Use helper to send the new tokens back
   sendTokenResponse(user, tokens, 200, res);
 });
