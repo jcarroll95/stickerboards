@@ -80,7 +80,7 @@ UserSchema.pre('save', async function() {
 UserSchema.methods.getSignedJwtToken = function() {
     // jwt needs the payload (user id and role) and the secret (from our config)
 
-    const accessToken =  jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, { expiresIn: '1m' });
+    const accessToken =  jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, { expiresIn: '15m' });
     const refreshToken = crypto.randomBytes(40).toString('hex');
     return { accessToken, refreshToken };
 }
