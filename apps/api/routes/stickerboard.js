@@ -8,9 +8,14 @@ const stickRouter = require('./stix');
 router.use('/:belongsToBoard/stix', stickRouter)
 const commentRouter = require('./comments');
 router.use('/:belongsToBoard/comments', commentRouter);
+const logRouter = require('./logEntry');
+router.use('/:belongsToBoard/logs', logRouter);
+
 
 const { protect, authorize } = require('../middleware/auth');
 const { idempotencyMiddleware } = require('../middleware/idempotency');
+
+
 
 // Bring in controller functions
 const {

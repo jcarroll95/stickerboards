@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+require('./LogEntry');
 const stickLocations = ['Stomach', 'Arm', 'Thigh', 'Other'];
 const stickLocMod = ['Left', 'Right', 'Upper', 'Upper Left', 'Upper Right', 'Lower', 'Lower Left', 'Lower Right'];
 
@@ -59,10 +59,7 @@ const StickSchema = new mongoose.Schema({
     }
 });
 
-// Mongoose: statics are called on the actual model, methods are called on the document
 StickSchema.statics.getAverageCost = async function(belongsToBoard) {
-    //console.log('Calculating average cost for board: '.blue, belongsToBoard);
-
     // Aggregate average cost for all stix that belong to this board
     const aggObj = await this.aggregate([
         { $match: { belongsToBoard: belongsToBoard } },
@@ -74,7 +71,7 @@ StickSchema.statics.getAverageCost = async function(belongsToBoard) {
         }
     ]);
 
-    // Update the Stickerboard with the new average (or 0 if no stix remain)
+
     try {
         const avg = aggObj.length > 0 ? aggObj[0].averageCost : 0;
         await this.model('Stickerboard').findByIdAndUpdate(
@@ -87,8 +84,16 @@ StickSchema.statics.getAverageCost = async function(belongsToBoard) {
     }
 }
 
-// Call getAverageCost after save
+
 StickSchema.post('save', async function() {
+  try {
+    await this.constructor.getAverageCost(this.belongsToBoard);
+  } catch (err) {
+    console.error('[CRITICAL] Failed to update averageCost:', err);
+  }
+});
+
+StickSchema.post('deleteOne', { document: true, query: false }, async function() {
   try {
     await this.constructor.getAverageCost(this.belongsToBoard);
   } catch (err) {
@@ -98,14 +103,41 @@ StickSchema.post('save', async function() {
   }
 });
 
+StickSchema.post('save', async function(doc) {
+  const LogEntry = mongoose.model('LogEntry');
+  const logs = [];
 
-StickSchema.post('deleteOne', { document: true, query: false }, async function() {
-  try {
-    await this.constructor.getAverageCost(this.belongsToBoard);
-  } catch (err) {
-    console.error('[CRITICAL] Failed to update averageCost:', err);
-    // Don't throw - don't fail the save because aggregate failed
-    // But log loudly so it's visible
+  // If weight was provided in the dose form
+  if (doc.weight) {
+    logs.push({
+      user: doc.user,
+      belongsToBoard: doc.belongsToBoard,
+      relatedStick: doc._id,
+      type: 'weight',
+      weight: doc.weight,
+      userDate: doc.userDate || doc.createdAt
+    });
+  }
+
+  // If NSV was provided in the dose form
+  if (doc.nsv) {
+    logs.push({
+      user: doc.user,
+      belongsToBoard: doc.belongsToBoard,
+      relatedStick: doc._id,
+      type: 'nsv',
+      nsv: doc.nsv,
+      userDate: doc.userDate || doc.createdAt
+    });
+  }
+
+  if (logs.length > 0) {
+    await LogEntry.insertMany(logs);
+
+    // Clean up the Stick document so data isn't duplicated
+    doc.weight = undefined;
+    doc.nsv = undefined;
+    await doc.save();
   }
 });
 

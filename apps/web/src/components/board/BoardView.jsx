@@ -16,7 +16,7 @@ import { generateOpId, storePendingOperation, completeOperation, failOperation }
 import StixList from './subcomponents/StixList.jsx';
 import styles from './BoardView.module.css';
 import formStyles from '../stix/AddStickForm.module.css';
-
+import AddLogEntryForm from '../logs/AddLogEntryForm.jsx';
 const StickerInterface = lazy(() => import('../stickerInterface/StickerInterface.jsx'));
 
 export default function BoardView({ token }) {
@@ -24,6 +24,7 @@ export default function BoardView({ token }) {
   const { me, refreshMe } = useMe();
   const { fetchUserStickerInventory } = useStickerInventory();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [logModal, setLogModal] = useState({ show: false, type: null });
   const [commentsVersion, setCommentsVersion] = useState(0);
   const [isAssetsReady, setIsAssetsReady] = useState(false);
   const stageRef = useRef(null);
@@ -172,9 +173,20 @@ export default function BoardView({ token }) {
         <h1 className={styles.title} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(board.name || 'Stickerboard') }} />
         <div style={{ display: 'flex', gap: '8px' }}>
           {isOwner && (
-            <button className={styles.addButton} onClick={() => setShowAddModal(true)}>
-              + Add Stick
-            </button>
+            <div className={styles.buttonGroup}>
+              <button className={styles.addButton} onClick={() => setShowAddModal(true)}>
+                + Add Stick
+              </button>
+              <button className={styles.addButton} onClick={() => setLogModal({ show: true, type: 'weight' })}>
+                Log Weight
+              </button>
+              <button className={styles.addButton} onClick={() => setLogModal({ show: true, type: 'nsv' })}>
+                Log Victory
+              </button>
+              <button className={styles.addButton} onClick={() => setLogModal({ show: true, type: 'note' })}>
+                Add Note
+              </button>
+            </div>
           )}
           {isAdmin && (
             <button className={styles.addButton} onClick={handleRegenerateThumbnail}>
@@ -357,9 +369,33 @@ export default function BoardView({ token }) {
           </div>
         </div>
       )}
+
+      {logModal.show && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalDialog}> {/* Use your existing modal styles */}
+            <div className={styles.modalHeader}>
+              <h3>Log {logModal.type === 'nsv' ? 'Non-Scale Victory' : logModal.type.charAt(0).toUpperCase() + logModal.type.slice(1)}</h3>
+              <button className={styles.modalClose} onClick={() => setLogModal({ show: false, type: null })}>&times;</button>
+            </div>
+            <div className={styles.modalBody}>
+              <AddLogEntryForm
+                boardId={board._id || board.id}
+                type={logModal.type}
+                onCancel={() => setLogModal({ show: false, type: null })}
+                onCreated={() => {
+                  setLogModal({ show: false, type: null });
+                  refreshBoard();
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+
 
 BoardView.propTypes = {
   token: PropTypes.string.isRequired,

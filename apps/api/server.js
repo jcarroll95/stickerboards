@@ -44,6 +44,7 @@ const users = require('./routes/users');
 const comments = require('./routes/comments');
 const admin = require('./routes/admin');
 const stickers = require('./routes/stickers');
+const logEntry = require('./routes/logEntry');
 
 // define express app
 const app = express();
@@ -86,7 +87,7 @@ app.use(
     genReqId: (req) => req.id,
     customProps: (req, res) => ({
       requestId: req.id,
-      userId: req.user?.id, // if you attach user on auth middleware
+      userId: req.user?.id,
     }),
   })
 );
@@ -96,13 +97,9 @@ const morganSkip = (req, res) => {
     // Skip noisy endpoints (adjust as needed)
     const url = req.originalUrl || '';
     if (url === '/healthz' || url === '/readyz') return true;
-
-    // Skip static assets if you serve any via Express
+    // skip static assets
     if (url.startsWith('/favicon')) return true;
     if (url.startsWith('/assets/')) return true;
-
-    // Optionally skip the metrics endpoint if you have one
-    // if (url.startsWith('/api/v1/admin/metrics')) return true;
 
     return false;
 };
@@ -172,20 +169,21 @@ app.use(fileupload());
 app.use(helmet());
 
 // mount routers
-app.use('/api/v1/stickerboards', stickerboard); // connecting our route to the file
+app.use('/api/v1/stickerboards', stickerboard);
 app.use('/api/v1/stix', stick);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/auth/users', users);
 app.use('/api/v1/comments', comments)
 app.use('/api/v1/admin', admin);
 app.use('/api/v1/stickers', stickers);
+app.use('/api/v1/logs', logEntry);
 
 app.use((req, res, next) => {
     const opts = { allowDots: true };
     if (req.body) mongoSanitize.sanitize(req.body, opts);
     if (req.params) mongoSanitize.sanitize(req.params, opts);
     if (req.headers) mongoSanitize.sanitize(req.headers, opts);
-    if (req.query) mongoSanitize.sanitize(req.query, opts); // mutate in place, do not reassign
+    if (req.query) mongoSanitize.sanitize(req.query, opts);
     next();
 });
 
@@ -206,7 +204,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Bring in idempotency error handling
 const { idempotencyErrorHandler } = require('./middleware/idempotency');
-app.use(idempotencyErrorHandler); // must be before your main error handler
+app.use(idempotencyErrorHandler); // must be before main error handler
 
 // Bring in the error wrapper
 const errorHandler = require('./middleware/error');

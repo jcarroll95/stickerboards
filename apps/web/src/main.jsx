@@ -11,7 +11,15 @@ import GlobalErrorBoundary from './components/common/GlobalErrorBoundary.jsx';
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <GlobalErrorBoundary>
-            <Toaster position="top-right" reverseOrder={false} />
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+            toastOptions={{
+              style: {
+                marginTop: '60px',
+              },
+            }}
+          />
             <Navbar />
             <div className="main-content">
                 <Router />

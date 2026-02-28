@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "pack": {
+    "packId": "start_eyes",
+    "name": "Eyes",
+    "description": "Starter Pack: Eyes",
+    "isActive": true
+  },
+  "defaults": {
+    "profile": "stickers-v1",
+    "tags": ["starter", "eyes"]
+  },
+  "stickers": [
+    {
+      "stickerId": "cool-sticks-06",
+      "name": "Look",
+      "description": "Look! eyes",
+      "inputRef": "001_eyes/cool-sticks-06",
+      "tags": ["look", "eyes", "starter"]
+    },
+    {
+      "stickerId": "cool-sticks-22",
+      "name": "surpreyes",
+      "description": "Surprised eyes",
+      "inputRef": "001_eyes/cool-sticks-22",
+      "tags": ["surprise", "eyes", "starter"]
+    },
+    {
+      "stickerId": "cool-sticks-33",
+      "name": "cooleye",
+      "description": "Cool eye sticker",
+      "inputRef": "001_eyes/cool-sticks-33",
+      "tags": ["eyes", "starter"]
+    },
+    {
+      "stickerId": "set1-01",
+      "name": "lOOk",
+      "description": "Look eyes 2",
+      "inputRef": "001_eyes/set1-01",
+      "tags": ["eyes", "starter"]
+    },
+    {
+      "stickerId": "set2-27",
+      "name": "onmymind",
+      "description": "On My Mind",
+      "inputRef": "001_eyes/set2-27",
+      "tags": ["eyes", "starter"]
+    },
+    {
+      "stickerId": "set3-02",
+      "name": "bigeyes2",
+      "description": "Surpreyes 2",
+      "inputRef": "001_eyes/set3-02",
+      "tags": ["eyes", "starter"]
+    },
+    {
+      "stickerId": "set3-05",
+      "name": "extendedvision",
+      "description": "Extended Vision eye",
+      "inputRef": "001_eyes/set3-05",
+      "tags": ["eyes", "starter"]
+    },
+    {
+      "stickerId": "set3-27",
+      "name": "tiredeye",
+      "description": "Tired eye",
+      "inputRef": "001_eyes/set3-27",
+      "tags": ["eyes", "starter"]
+    }
+  ]
+}
