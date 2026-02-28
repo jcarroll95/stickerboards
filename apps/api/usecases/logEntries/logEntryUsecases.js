@@ -75,33 +75,6 @@ async function getEntry({ logEntryId }) {
 }
 
 /**
- * Get entries for a user, with optional type filtering.
- * @param {{ userId: string, type?: string }} args
- */
-async function getEntries({ userId, type }) {
-  // 1. Start with the user filter
-  const query = { user: userId };
-
-  // 2. Apply type filter if requested (e.g., 'weight' or 'nsv')
-  if (type) {
-    query.type = type;
-  }
-
-  // 3. Return sorted by date (newest first)
-  const entries = await LogEntry.find(query)
-    .sort({ userDate: -1 })
-    .populate({
-      path: 'belongsToBoard',
-      select: 'name'
-    });
-
-  return {
-    count: entries.length,
-    entries
-  };
-}
-
-/**
  * Delete a logEntry.
  * @param {{ logEntryId: string, actor: { id: string, role: string } }} args
  */
