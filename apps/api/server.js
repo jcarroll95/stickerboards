@@ -45,6 +45,7 @@ const comments = require('./routes/comments');
 const admin = require('./routes/admin');
 const stickers = require('./routes/stickers');
 const logEntry = require('./routes/logEntry');
+const community = require('./routes/community');
 
 // define express app
 const app = express();
@@ -177,6 +178,7 @@ app.use('/api/v1/comments', comments)
 app.use('/api/v1/admin', admin);
 app.use('/api/v1/stickers', stickers);
 app.use('/api/v1/logs', logEntry);
+app.use('/api/v1/community', community);
 
 app.use((req, res, next) => {
     const opts = { allowDots: true };

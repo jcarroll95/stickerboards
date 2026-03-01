@@ -1,3 +1,11 @@
+jest.mock('mongodb-memory-server', () => ({
+  MongoMemoryServer: {
+    create: jest.fn().mockResolvedValue({
+      getUri: jest.fn().mockReturnValue('mongodb://localhost:27017/dummy'),
+      stop: jest.fn().mockResolvedValue(true),
+    }),
+  },
+}));
 const { pickAllowedBoardFields } = require('../../domain/stickerboards/pickAllowedBoardFields');
 
 const allowedFields = ['name', 'description', 'tags', 'photo', 'stickers'];

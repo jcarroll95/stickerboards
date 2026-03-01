@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const ErrorResponse = require('../../utils/errorResponse');
-
+const MomentumService = require('../../services/momentumService');
 const Stick = require('../../models/Stick');
 const Stickerboard = require('../../models/Stickerboard');
 const StickerPack = require('../../models/StickerPack');
@@ -121,6 +121,9 @@ async function addStick({ actor, boardId, body }) {
       { $push: { stickers: paletteSticker } },
       { ...sessionOpt, new: true, runValidators: true }
     );
+
+    // let's throw to momentum for user awards
+    await MomentumService.logAction(actor.id, 'stickMe', { boardId });
 
     if (useTransaction) await session.commitTransaction();
     session.endSession();

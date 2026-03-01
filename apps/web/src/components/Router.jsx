@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import useAuthStore from '../store/authStore.js';
+import useCommunityStore from '../store/communityStore.js';
 import LoadingSpinner from './common/LoadingSpinner.jsx';
 import styles from './Router.module.css';
 
@@ -20,12 +21,18 @@ const LandingPage = lazy(() => import('./LandingPage.jsx'));
 export default function Router() {
   const [hash, setHash] = useState(() => window.location.hash || '#/');
   const { isAuthenticated, user } = useAuthStore();
+  const { fetchStats } = useCommunityStore();
 
   useEffect(() => {
-    const onHashChange = () => setHash(window.location.hash || '#/');
+    const onHashChange = () => {
+      setHash(window.location.hash || '#/');
+      if (isAuthenticated) {
+        fetchStats();
+      }
+    };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
+  }, [isAuthenticated, fetchStats]);
 
   const route = useMemo(() => {
     const h = hash.startsWith('#') ? hash : `#/${hash}`;

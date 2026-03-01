@@ -39,7 +39,9 @@ exports.updateLogEntry = asyncHandler(async (req, res) => {
     actor: req.user,
     body: req.body
   });
+
   res.status(200).json({ success: true, ...result });
+
 });
 
 // @desc    Delete a log entry

@@ -65,6 +65,11 @@ const UserSchema = new mongoose.Schema({
         type: [Number],
         default: [0, 1, 2, 3, 4]
     },
+    momentumBalance: {
+      type: Number,
+      default: 0,
+      index: true
+    },
     createdAt: {
         type: Date,
         default: Date.now

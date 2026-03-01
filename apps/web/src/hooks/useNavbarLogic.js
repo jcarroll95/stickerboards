@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
 import apiClient from '../services/apiClient.jsx';
 import useAuthStore from '../store/authStore.js';
+import useCommunityStore from '../store/communityStore.js';
 
 export function useNavbarLogic() {
   const { user, login } = useAuthStore();
+  const { fetchStats } = useCommunityStore();
   const [navigatingMyBoard, setNavigatingMyBoard] = useState(false);
   const [navigatingCheer, setNavigatingCheer] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -80,6 +82,7 @@ export function useNavbarLogic() {
       const response = await apiClient.get('/auth/me');
       login(response.data || response);
       setLoginOpen(false);
+      fetchStats();
       return true;
     } catch (err) {
       setLoginError(err.response?.data?.error || err.message || 'Login failed');

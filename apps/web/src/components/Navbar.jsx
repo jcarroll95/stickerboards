@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Navbar.module.css';
 import useAuthStore from '../store/authStore.js';
+import useCommunityStore from '../store/communityStore.js';
 import LoginDropdown from './navbar/LoginDropdown.jsx';
 import UserMenuDropdown from './navbar/UserMenuDropdown.jsx';
 import { useNavbarLogic } from '../hooks/useNavbarLogic.js';
@@ -25,9 +26,12 @@ const Navbar = () => {
         performLogin
     } = useNavbarLogic();
 
+    const { stats, fetchStats } = useCommunityStore();
+
     useEffect(() => {
         initialize();
-    }, [initialize]);
+        fetchStats();
+    }, [initialize, fetchStats]);
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
@@ -70,6 +74,11 @@ const Navbar = () => {
             </div>
 
             <ul className={styles.navLinks}>
+                {stats.totalWeightLost > 0 && (
+                    <li className={styles.communityStats}>
+                        <span className={styles.statsLabel}>{Math.round(stats.totalWeightLost)} lbs lost together</span>
+                    </li>
+                )}
                 <li>
                     <button className={styles.link} disabled={navigatingMyBoard} onClick={goToMyBoard}>
                         {navigatingMyBoard ? 'My Board…' : 'My Board'}
@@ -112,8 +121,8 @@ const Navbar = () => {
             <div className={styles.auth}>
                 {!user ? (
                     <>
-                        <button 
-                            className={`${styles.button} ${styles.createAccountButton}`} 
+                        <button
+                            className={`${styles.button} ${styles.createAccountButton}`}
                             onClick={() => { window.location.hash = '#/register'; }}
                         >
                             Create Account
@@ -123,7 +132,7 @@ const Navbar = () => {
                                 Login
                             </button>
                             {loginOpen && (
-                                <LoginDropdown 
+                                <LoginDropdown
                                     email={email} setEmail={setEmail}
                                     password={password} setPassword={setPassword}
                                     loggingIn={loggingIn} loginError={loginError}
@@ -138,7 +147,7 @@ const Navbar = () => {
                             {user.name || 'User'}
                         </button>
                         {menuOpen && (
-                            <UserMenuDropdown 
+                            <UserMenuDropdown
                                 user={user}
                                 navigatingMyBoard={navigatingMyBoard}
                                 onGoToMyBoard={goToMyBoard}

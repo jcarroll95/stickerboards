@@ -1,5 +1,6 @@
 const LogEntry = require('../../models/LogEntry');
 const ErrorResponse = require('../../utils/errorResponse');
+const MomentumService = require('../../services/momentumService');
 async function addEntry({ actor, boardId, body }) {
 
   const entryData = {
@@ -16,6 +17,14 @@ async function addEntry({ actor, boardId, body }) {
   }
 
   const entry = await LogEntry.create(entryData);
+
+  // adding a basic momentum service trigger for making log entries
+  const triggerMap = { weight: 'weightLog', note: 'doseLog', nsv: 'nsvLog' };
+  await MomentumService.logAction(entryData.user, triggerMap[entryData.type] || 'doseLog', {
+    weight: entry.weight,
+    entryId: entry._id
+  });
+
   return entry;
 }
 

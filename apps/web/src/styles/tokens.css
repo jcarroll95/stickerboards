@@ -24,6 +24,11 @@
   --space-7: 2rem;     /* 32px */
   --space-8: 2.5rem;   /* 40px */
 
+  /* Dynamic brand hue driven by community momentum */
+  --brand-hue: 210deg; /* default hue; updated at runtime */
+  --primary: hsl(var(--brand-hue) 85% 55%);
+  --primary-foreground: hsl(var(--brand-hue) 100% 98%);
+
   /* Color palette mapped to Figma globals */
   --color-bg: var(--background);                 /* page background */
   --color-surface: var(--card);                  /* card/surface */
