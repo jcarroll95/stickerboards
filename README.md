@@ -15,7 +15,7 @@ A production-deployed social “stickerboard” designed for GLP-1 users to stay
 
 Stickerboards is a full-stack monorepo application built to explore:
 
-- Secure JWT-based stateless auth with RBAC, automatic token refresh and Redis-based blacklisting
+- Secure JWT-based auth with RBAC, automatic token refresh and Redis-based blacklisting
 - Idempotent transactional reward systems
 - Retrieval-augmented LLM insight engine over longitudinal user data and curated medical literature
 - Image-heavy UI performance optimization
