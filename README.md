@@ -31,6 +31,7 @@ The system is intentionally designed beyond CRUD patterns, with strong emphasis 
 ## Monorepo Structure
 
 Organized as an **npm workspaces monorepo**:
+
 -apps/
 --api/ -> Node.js + Express REST API
 --web/ -> React + Vite SPA
@@ -46,7 +47,7 @@ This enables:
 
 ## Architectural Style
 
-Stickerboards follows a **Domain-Oriented Layered Architecture** with separation of concerns, isolated business logic, and an ea
+Stickerboards follows a **Domain-Oriented Layered Architecture** with separation of concerns and isolated business logic.
 
 ### Current Structure
 
@@ -132,7 +133,7 @@ Tradeoff:
 
 ## 4. RBAC via JWT Payload
 
-Stateless authentication uses:
+JWT authentication uses:
 
 - JWTs stored in HttpOnly cookies (access token and refresh token)
 - Role-based claims embedded in JWT payload (access token)
@@ -142,8 +143,8 @@ Stateless authentication uses:
 Frontend listens for `auth:unauthorized` broadcast events to gracefully handle session expiry.
 
 Tradeoff:
-- JWT-based RBAC over server-side sessions.
-- Chosen for statelessness and deployment simplicity.
+- JWT-based RBAC over server-side sessions
+- Token blacklist minimizes state requirements
 
 ---
 
