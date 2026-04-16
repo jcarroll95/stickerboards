@@ -15,8 +15,9 @@ A production-deployed social “stickerboard” designed for GLP-1 users to stay
 
 Stickerboards is a full-stack monorepo application built to explore:
 
+- Secure JWT-based auth with RBAC, automatic token refresh and Redis-based blacklisting
 - Idempotent transactional reward systems
-- Secure JWT-based stateless auth with RBAC, automatic token refresh and Redis-based blacklisting
+- Retrieval-augmented LLM insight engine over longitudinal user data and curated medical literature
 - Image-heavy UI performance optimization
 - Auditability of administrative actions
 - Production deployment with observability and backups
@@ -30,6 +31,7 @@ The system is intentionally designed beyond CRUD patterns, with strong emphasis 
 ## Monorepo Structure
 
 Organized as an **npm workspaces monorepo**:
+
 -apps/
 --api/ -> Node.js + Express REST API
 --web/ -> React + Vite SPA
@@ -45,9 +47,7 @@ This enables:
 
 ## Architectural Style
 
-Stickerboards currently follows a **Domain-Oriented Layered Architecture**.
-
-It has moved beyond MVC by isolating business logic in `usecases`, but it does not yet fully implement strict Hexagonal Architecture.
+Stickerboards follows a **Domain-Oriented Layered Architecture** with separation of concerns and isolated business logic.
 
 ### Current Structure
 
@@ -133,7 +133,7 @@ Tradeoff:
 
 ## 4. RBAC via JWT Payload
 
-Stateless authentication uses:
+JWT authentication uses:
 
 - JWTs stored in HttpOnly cookies (access token and refresh token)
 - Role-based claims embedded in JWT payload (access token)
@@ -143,8 +143,8 @@ Stateless authentication uses:
 Frontend listens for `auth:unauthorized` broadcast events to gracefully handle session expiry.
 
 Tradeoff:
-- JWT-based RBAC over server-side sessions.
-- Chosen for statelessness and deployment simplicity.
+- JWT-based RBAC over server-side sessions
+- Token blacklist minimizes state requirements
 
 ---
 
@@ -162,6 +162,21 @@ Tradeoff:
 - Reduces infrastructure complexity at current scale.
 
 ---
+
+## 6. LLM-powered insight engine for user trend feedback
+
+Stickerboards periodically examines longitudinal user behavior against curated medical literature to offer users insights about how reported behaviors may align with peer-reviewed conclusions about weight loss. This presents several challenges:
+
+- The system must reliably avoid giving medical advice or the appearance thereof
+- LLM-originated insights must not be exploitable by user action to produce unsafe information
+- Commercial API access must be secure and durable against abuse
+- Curated medical data must be reasonably chunked while still adding value
+- User data is deterministically compressed into numeric trends before it's given to LLM
+- LLM output is validated by two-layer safety system before release: programmatic keyword/reference check, and second-model LLM validation. Must pass both for release to user.
+
+Tradeoff:
+- Prompting is originated by the server at scheduled intervals and is not available by user demand - less flexible, more secure
+- Released insights identify trends, reference medical conclusions in papers without drawing connections - output is less personal, but much safer
 
 # Security & Hardening
 
