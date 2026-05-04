@@ -1,5 +1,5 @@
-[![CI](https://github.com/jcarroll95/stickers/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jcarroll95/stickers/actions/workflows/ci.yml)
-[![Deploy (PM2)](https://github.com/jcarroll95/stickers/actions/workflows/deploy-pm2.yml/badge.svg)](https://github.com/jcarroll95/stickers/actions/workflows/deploy-pm2.yml)
+[![CI](https://github.com/jcarroll95/stickerboards/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jcarroll95/stickerboards/actions/workflows/ci.yml)
+[![Deploy (PM2)](https://github.com/jcarroll95/stickerboards/actions/workflows/deploy-pm2.yml/badge.svg)](https://github.com/jcarroll95/stickerboards/actions/workflows/deploy-pm2.yml)
 
 # Stickerboards
 
@@ -203,10 +203,6 @@ Tradeoff:
 - Alert rules (e.g., 5 errors in 5 minutes)
 - Structured logs for operational clarity
 - Rolling file logs accessible via admin dashboard
-
-## Error Tracking
-
-- **Sentry integration (in progress)** for exception aggregation and stack trace analysis.
 
 ## Backups
 
