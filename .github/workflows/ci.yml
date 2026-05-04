@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch: {}
+  paths-ignore:
+    - '**.md'
 
 # Cancels older runs when you push new commits to the same PR
 concurrency:
