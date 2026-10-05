@@ -1,5 +1,5 @@
 [![CI](https://github.com/jcarroll95/stickerboards/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jcarroll95/stickerboards/actions/workflows/ci.yml)
-[![Deploy (PM2)](https://github.com/jcarroll95/stickerboards/actions/workflows/deploy-pm2.yml/badge.svg)](https://github.com/jcarroll95/stickerboards/actions/workflows/deploy-pm2.yml)
+[![Docker image](https://github.com/jcarroll95/stickerboards/actions/workflows/docker.yml/badge.svg?branch=main)](https://github.com/jcarroll95/stickerboards/actions/workflows/docker.yml)
 
 # Stickerboards
 
@@ -206,20 +206,19 @@ Tradeoff:
 
 ## Backups
 
-- Weekly full server backups
-- Daily MongoDB backups to DigitalOcean Spaces (object storage)
+- Nightly `mongodump` from the cluster, pulled by a separate backup host that the cluster has no credentials for
+- Media bucket synced the same way
 
 ## Deployment
 
-- Artifact-based CI/CD via GitHub Actions
-- Immutable release directories
-- Atomic symlink cutover
-- PM2 process management
-- Non-root application user
+- One container image (API serving the built web app), built by GitHub Actions and pushed to GHCR tagged with the commit SHA
+- Runs on a self-hosted k3s cluster behind Cloudflare Tunnel → Traefik; deployment manifests live in a separate infrastructure repo
+- Per-app namespace with default-deny network policies; MongoDB replica set and Redis in the same namespace; media in Garage (S3-compatible)
+- Non-root container, `/healthz` and `/readyz` probes, graceful shutdown on SIGTERM
+- Runtime knobs for the proxy chain and object store: `TRUST_PROXY_HOPS` (2 behind Cloudflare → cloudflared → Traefik), `S3_FORCE_PATH_STYLE=true` for Garage
 
 Tradeoff:
-- VPS-based deployment instead of managed PaaS.
-- Chosen for deeper infrastructure exposure and learning value.
+- Self-hosted instead of a VPS or managed PaaS: no hosting bill, and the infrastructure work is the point.
 
 ---
 

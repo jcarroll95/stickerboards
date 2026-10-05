@@ -58,12 +58,27 @@ app.get('/healthz', (req, res) => {
   });
 });
 
+// Readiness: only report ready once MongoDB is connected, so a pod is not sent traffic
+// before it can serve it (used as the Kubernetes readinessProbe).
+app.get('/readyz', (req, res) => {
+  const mongoose = require('mongoose');
+  const ready = process.env.NODE_ENV === 'test' || mongoose.connection.readyState === 1;
+  res.status(ready ? 200 : 503).json({
+    success: ready,
+    status: ready ? 'READY' : 'NOT_READY',
+    mongo: mongoose.connection.readyState,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Attach request IDs early so all downstream logs/metrics can include them
 app.use(requestIdMiddleware);
 morgan.token('request-id', (req) => req.id);
 
-// If behind NGINX (reverse proxy), make Express respect X-Forwarded-For
-app.set('trust proxy', 1);
+// Behind a reverse proxy, make Express respect X-Forwarded-For / X-Forwarded-Proto.
+// Number of trusted hops: 1 behind nginx; 2 behind Cloudflare -> cloudflared -> Traefik on
+// the k3s cluster, where X-Forwarded-For arrives as "<visitor>, <cloudflared pod>".
+app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS ?? 1));
 
 // Use compression middleware
 app.use(compression());
@@ -233,6 +248,25 @@ if (require.main === module) {
         // close server and exit process if this happens so app doesn't stay running
         server.close(() => process.exit(1));
     });
+
+    // Graceful shutdown: stop accepting connections, let in-flight requests finish, close
+    // MongoDB, then exit. Kubernetes sends SIGTERM and waits 30 s before SIGKILL.
+    const shutdown = (signal) => {
+        console.log(`${signal} received, shutting down`);
+        const forceExit = setTimeout(() => process.exit(1), 25000);
+        forceExit.unref();
+        server.close(async () => {
+            try {
+                const mongoose = require('mongoose');
+                await mongoose.connection.close(false);
+            } catch (e) {
+                console.error('Error closing MongoDB connection', e);
+            }
+            process.exit(0);
+        });
+    };
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 module.exports = app;
