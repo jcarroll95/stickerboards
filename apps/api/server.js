@@ -181,8 +181,22 @@ app.use(cookieParser());
 // file upload for express
 app.use(fileupload());
 
-// helmet
-app.use(helmet());
+// helmet. The API also serves the web app, so its Content-Security-Policy governs the pages:
+// images come from the media host (MEDIA_BASE_URL) and, during a migration, from any extra
+// origins listed in CSP_IMG_EXTRA_ORIGINS (space-separated). blob: is for canvas exports.
+const originOf = (u) => { try { return new URL(u).origin; } catch { return null; } };
+const imgOrigins = [
+    originOf(process.env.MEDIA_BASE_URL),
+    ...(process.env.CSP_IMG_EXTRA_ORIGINS || '').split(/\s+/).map(originOf),
+].filter(Boolean);
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            'img-src': ["'self'", 'data:', 'blob:', ...imgOrigins],
+        },
+    },
+}));
 
 // mount routers
 app.use('/api/v1/stickerboards', stickerboard);
