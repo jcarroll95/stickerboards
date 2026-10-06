@@ -13,7 +13,7 @@ function makeS3Client() {
   return new S3Client({
     region: "us-east-1",
     endpoint: requiredEnv("DO_SPACES_ENDPOINT"),
-    forcePathStyle: false,
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE === "true",
     credentials: {
       accessKeyId: requiredEnv("DO_SPACES_KEY"),
       secretAccessKey: requiredEnv("DO_SPACES_SECRET"),

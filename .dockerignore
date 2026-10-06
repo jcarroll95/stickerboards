@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/config.env
+.git
+.github
+.idea
+.postman
+docs
+e2e
+data/assets/staged
+data/assets/processed
+data/assets/uploads
+data/assets/archive
+data/assets/tmp
+*.md
